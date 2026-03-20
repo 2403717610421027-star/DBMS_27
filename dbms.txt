@@ -1,0 +1,91 @@
+import sqlite3
+
+
+con = sqlite3.connect("blood_donor.db")
+cur = con.cursor()
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS Donor_Details(
+    donor_id INTEGER PRIMARY KEY,
+    name TEXT,
+    blood_group TEXT,
+    city TEXT,
+    phone TEXT,
+    last_donation TEXT
+)
+""")
+con.commit()
+
+while True:
+    print("\n===================================")
+    print("\tBLOOD DONOR MANAGEMENT SYSTEM")
+    print("===================================")
+    print("1. Insert Donor Record")
+    print("2. View Donor Records")
+    print("3. Update Donor Phone")
+    print("4. Delete Donor Record")
+    print("5. Exit")
+
+    choice = int(input("Enter your choice: "))
+
+    if choice == 1:
+        print("\nEnter Donor Details")
+        did = int(input("Donor ID: "))
+        name = input("Donor Name: ")
+        bg = input("Blood Group: ")
+        city = input("City: ")
+        phone = input("Phone Number: ")
+        date = input("Last Donation Date: ")
+
+        cur.execute(
+            "INSERT INTO Donor_Details VALUES(?,?,?,?,?,?)",
+            (did, name, bg, city, phone, date)
+        )
+        con.commit()
+
+        print("Donor record inserted successfully")
+
+
+    elif choice == 2:
+        cur.execute("SELECT * FROM Donor_Details")
+        rows = cur.fetchall()
+
+        print("\nDonor ID | Name | Blood Group | City | Phone | Last Donation")
+        print("-------------------------------------------------------------")
+        for r in rows:
+            print(r[0], "|", r[1], "|", r[2], "|", r[3], "|", r[4], "|", r[5])
+
+
+    elif choice == 3:
+        did = int(input("Enter Donor ID to update: "))
+        new_phone = input("Enter new phone number: ")
+
+        cur.execute(
+            "UPDATE Donor_Details SET phone=? WHERE donor_id=?",
+            (new_phone, did)
+        )
+        con.commit()
+
+        print("Phone number updated successfully")
+
+
+    elif choice == 4:
+        did = int(input("Enter Donor ID to delete: "))
+
+        cur.execute(
+            "DELETE FROM Donor_Details WHERE donor_id=?",
+            (did,)
+        )
+        con.commit()
+
+        print("Donor record deleted successfully")
+
+    elif choice == 5:
+        print("Exiting program")
+        break
+
+    else:
+        print("Invalid choice")
+
+
+con.close()
