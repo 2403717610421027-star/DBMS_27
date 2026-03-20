@@ -1,0 +1,88 @@
+import sqlite3
+
+con = sqlite3.connect("student_library.db")
+cur = con.cursor()
+
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS Library_Records(
+student_id INTEGER,
+student_name TEXT,
+book_name TEXT,
+issue_date TEXT,
+return_status TEXT
+)
+""")
+
+con.commit()
+
+while True:
+
+    print("\n==============================")
+    print(" STUDENT LIBRARY MANAGEMENT ")
+    print("==============================")
+    print("1. Insert Record")
+    print("2. View Records")
+    print("3. Update Return Status")
+    print("4. Delete Record")
+    print("5. Exit")
+
+    choice = int(input("Enter your choice: "))
+
+    if choice == 1:
+
+        sid = int(input("Student ID: "))
+        name = input("Student Name: ")
+        book = input("Book Name: ")
+        issue = input("Issue Date: ")
+        status = input("Return Status (Returned/Not Returned): ")
+
+        cur.execute("INSERT INTO Library_Records VALUES(?,?,?,?,?)",
+                    (sid, name, book, issue, status))
+
+        con.commit()
+        print("Record inserted successfully")
+
+    
+    elif choice == 2:
+
+        cur.execute("SELECT * FROM Library_Records")
+        rows = cur.fetchall()
+
+        print("\nStudent ID | Name | Book | Issue Date | Status")
+        print("------------------------------------------------")
+
+        for r in rows:
+            print(r[0], "|", r[1], "|", r[2], "|", r[3], "|", r[4])
+
+    
+    elif choice == 3:
+
+        sid = int(input("Enter Student ID to update: "))
+        new_status = input("Enter new return status: ")
+
+        cur.execute("UPDATE Library_Records SET return_status=? WHERE student_id=?",
+                    (new_status, sid))
+
+        con.commit()
+        print("Return status updated successfully")
+
+    
+    elif choice == 4:
+
+        sid = int(input("Enter Student ID to delete: "))
+
+        cur.execute("DELETE FROM Library_Records WHERE student_id=?", (sid,))
+        con.commit()
+
+        print("Record deleted successfully")
+
+    
+    elif choice == 5:
+        print("Exiting program")
+        break
+
+    else:
+        print("Invalid choice")
+
+con.close()
